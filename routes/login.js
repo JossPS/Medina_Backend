@@ -1,0 +1,75 @@
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const userSchema = require('../models/User');
+const verifyToken = require('../middleware/verifyToken');
+const { loginUser } = require('../controllers/userController');
+
+const router = express.Router();
+
+const refreshToken = [];
+
+router.post('/login', loginUser, async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Buscar el usuario por email
+    const user = await userSchema.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'usuario no encontrado' });
+
+    if (user.role !== 'admin') {
+      return res.status(403).json({ message: 'Acceso denegado: solo administradores' });
+    }
+
+    // Verificar contraseña
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) return res.status(401).json({ message: 'Wrong password' });
+
+    const accesToken = jwt.sign(
+      { id: user._id, role: user.role, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+
+    const refreshTokenValue = jwt.sign(
+      { id: user._id, role: user.role, email: user.email },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: '30d' }
+    );
+    // Guardar el refresh token en la lista
+    refreshToken.push(refreshTokenValue);
+
+    res.json({
+      accesToken,
+      refreshToken: refreshTokenValue,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role
+      },
+      message: 'Ingreso exitoso'
+    });
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+});
+
+router.get('/verify-token', verifyToken, (req, res) => {
+  res.json({ user: req.user }); // Devuelve los datos del usuario decodificados del token
+});
+
+router.post('/logout', (req, res) => {
+  const { token } = req.body;
+
+  // Eliminar el refresh token de la lista
+  const index = refreshToken.indexOf(token);
+  if (index !== -1) {
+    refreshToken.splice(index, 1);
+    return res.status(200).json({ message: 'Logout successful' });
+  }
+
+  res.status(400).json({ message: 'Invalid token' });
+});
+
+module.exports = router;
