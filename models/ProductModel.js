@@ -47,5 +47,5 @@ const productSchema = new mongoose.Schema({
     
 }, { timestamps: true });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = mongoose.model('ProductModel', productSchema);
 // Exportamos el modelo de producto para usarlo en otras partes de la aplicación
