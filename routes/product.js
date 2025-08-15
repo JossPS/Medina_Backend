@@ -1,5 +1,9 @@
 const express = require('express');
+<<<<<<< HEAD
 const Product = require('../models/ProductModel'); 
+=======
+const Product = require('../models/ProductModel');  
+>>>>>>> 2b65d03 (Fix: actualizar ruta de modelo a ProductModel)
 const verifyToken = require('../middleware/verifyToken');
 const verifyAdmin = require('../middleware/verifyAdmin');
 const router = express.Router();
