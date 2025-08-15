@@ -7,7 +7,6 @@ require('dotenv').config();
 const productRoutes = require('./routes/product');
 const userRoutes = require('./routes/user'); 
 const loginRoutes = require('./routes/login'); 
-const verifyToken   = require('./middleware/verifyToken');
 
 const app = express();
 const port = process.env.PORT || 9000;  // podemos modificar el puerto solo aqui, ahi se actualiza a toda la app
@@ -16,45 +15,38 @@ const port = process.env.PORT || 9000;  // podemos modificar el puerto solo aqui
 app.use(cors()); 
 app.use(express.json());
 
-
+// Rutas API
 app.use('/api/products', productRoutes); // Usamos las rutas de producto
 app.use('/api/auth', loginRoutes);
-
-
 app.use('/api', userRoutes); 
 
-
+//Rutas estáticas para servir archivos
 app.use('/uploads', express.static(path.join(__dirname, './uploads'))); 
 app.use('/cliente', express.static(path.join(__dirname, '../Frontend-Client')));
 app.use('/admin', express.static(path.join(__dirname, '../Frontend-admin')));
 
-// Ruta raíz → redirige al cliente
+// Ruta raíz redirige al catálogo
 app.get('/', (req, res) => {
+  res.redirect('/catalog');
+});
+
+// Ruta limpia para el catálogo
+app.get('/catalog', (req, res) => {
   res.redirect('/cliente/catalog.html');
 });
 
-// Rutas limpias opcionales
-app.get('/login', (req, res) => {
-  res.redirect('/admin/login.html');
-});
-
-app.get('/admin-panel', (req, res) => {
+// Ruta limpia para el panel de administrador
+app.get('/admin', (req, res) => {
   res.redirect('/admin/admin.html');
 });
 
-// Redirecciones para limpiar la URL
-app.get('/admin', (req, res) => {
-  res.redirect('/admin');
+// Ruta limpia para login del admin
+app.get('/admin-login', (req, res) => {
+  res.redirect('/admin/login.html');
 });
 
-app.get('/login', (req, res) => {
-  res.redirect('/login');
-});
-
-app.get('/index', (req, res) => {
-  res.redirect('/');
-});
-
+// Healthcheck (para Render)
+app.get('/health', (_req, res) => res.send('ok'));
 
 //Conection to mongo DB
 mongoose
