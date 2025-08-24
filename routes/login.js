@@ -9,23 +9,21 @@ const router = express.Router();
 
 const refreshToken = [];
 
-router.post('/login', loginUser, async (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Buscar el usuario por email
     const user = await userSchema.findOne({ email });
-    if (!user) return res.status(404).json({ message: 'usuario no encontrado' });
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    if (user.role !== 'admin') {
+    if (user.role.toLowerCase() !== 'admin') {
       return res.status(403).json({ message: 'Acceso denegado: solo administradores' });
     }
 
-    // Verificar contraseña
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return res.status(401).json({ message: 'Wrong password' });
+    if (!validPassword) return res.status(401).json({ message: 'Contraseña incorrecta' });
 
-    const accesToken = jwt.sign(
+    const accessToken = jwt.sign(
       { id: user._id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: '15m' }
@@ -36,11 +34,11 @@ router.post('/login', loginUser, async (req, res) => {
       process.env.JWT_REFRESH_SECRET,
       { expiresIn: '30d' }
     );
-    // Guardar el refresh token en la lista
-    refreshToken.push(refreshTokenValue);
+
+    refreshToken.push(refreshTokenValue); // temporal
 
     res.json({
-      accesToken,
+      accessToken,
       refreshToken: refreshTokenValue,
       user: {
         id: user._id,
@@ -54,6 +52,7 @@ router.post('/login', loginUser, async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
+
 
 router.get('/verify-token', verifyToken, (req, res) => {
   res.json({ user: req.user }); // Devuelve los datos del usuario decodificados del token
