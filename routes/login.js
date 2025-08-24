@@ -3,10 +3,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const userSchema = require('../models/User');
 const verifyToken = require('../middleware/verifyToken');
-const { loginUser } = require('../controllers/userController');
 
 const router = express.Router();
-
 const refreshToken = [];
 
 router.post('/login', async (req, res) => {
@@ -23,14 +21,18 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(401).json({ message: 'Contraseña incorrecta' });
 
+    // Logs temporales para asegurarnos que se leen
     console.log('JWT_SECRET from env:', process.env.JWT_SECRET || '<<NO VALUE>>');
     console.log('JWT_REFRESH_SECRET from env:', process.env.JWT_REFRESH_SECRET || '<<NO VALUE>>');
+
+    // Token de acceso
     const accessToken = jwt.sign(
       { id: user._id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: '15m' }
     );
 
+    // Token de refresco usando la nueva variable
     const refreshTokenValue = jwt.sign(
       { id: user._id, role: user.role, email: user.email },
       process.env.JWT_REFRESH_SECRET,
@@ -55,15 +57,13 @@ router.post('/login', async (req, res) => {
   }
 });
 
-
 router.get('/verify-token', verifyToken, (req, res) => {
-  res.json({ user: req.user }); // Devuelve los datos del usuario decodificados del token
+  res.json({ user: req.user });
 });
 
 router.post('/logout', (req, res) => {
   const { token } = req.body;
 
-  // Eliminar el refresh token de la lista
   const index = refreshToken.indexOf(token);
   if (index !== -1) {
     refreshToken.splice(index, 1);
