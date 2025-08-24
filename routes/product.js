@@ -50,6 +50,14 @@ router.get('/', async (req, res) => {
 
 router.post('/', verifyToken, verifyAdmin, upload.single('imageUrl'), async (req, res) => {
   try {
+    console.log(' req.body:', req.body);
+    console.log(' req.file:', req.file);
+
+    //Validar si no llegó imagen
+    if (!req.file?.secure_url) {
+      return res.status(400).json({ error: 'No se recibió una imagen válida desde Cloudinary' });
+    }
+
     // Validar código único
     const existingProduct = await Product.findOne({ code: req.body.code });
     if (existingProduct) {
@@ -65,17 +73,18 @@ router.post('/', verifyToken, verifyAdmin, upload.single('imageUrl'), async (req
       description: req.body.description,
       stock: req.body.stock,
       promotion: req.body.promotion === 'true',
-      imageUrl: req.file?.secure_url || '',  // CORREGIDO
+      imageUrl: req.file.secure_url,
       category: req.body.category
     });
 
     await newProduct.save();
     res.status(201).json(newProduct);
   } catch (error) {
-    console.error(error);
+    console.error(' ERROR AL CREAR PRODUCTO:', error);
     return res.status(400).json({ error: 'Error creating product', details: error.message });
   }
 });
+
 
 
 router.put('/:id', verifyToken, verifyAdmin, upload.single('imageUrl'), async (req, res) => {
