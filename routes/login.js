@@ -21,7 +21,7 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(401).json({ message: 'Contraseña incorrecta' });
 
-    // Logs temporales para asegurarnos que se leen
+    // Logs para verificar variables de entorno
     console.log('JWT_SECRET from env:', process.env.JWT_SECRET || '<<NO VALUE>>');
     console.log('JWT_REFRESH_SECRET from env:', process.env.JWT_REFRESH_SECRET || '<<NO VALUE>>');
 
@@ -32,7 +32,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '15m' }
     );
 
-    // Token de refresco usando la nueva variable
+    // Token de refresco
     const refreshTokenValue = jwt.sign(
       { id: user._id, role: user.role, email: user.email },
       process.env.JWT_REFRESH_SECRET,
