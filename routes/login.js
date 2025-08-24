@@ -23,6 +23,8 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(401).json({ message: 'Contraseña incorrecta' });
 
+    console.log('JWT_SECRET from env:', process.env.JWT_SECRET || '<<NO VALUE>>');
+    console.log('JWT_REFRESH_SECRET from env:', process.env.JWT_REFRESH_SECRET || '<<NO VALUE>>');
     const accessToken = jwt.sign(
       { id: user._id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
