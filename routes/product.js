@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
 });
 
 
-router.post('/', verifyToken, verifyAdmin, upload.single('imageUrl'), async (req, res) => {
+router.post('/', verifyToken, verifyAdmin, upload.single('image'), async (req, res) => {
   try {
     console.log(' req.body:', req.body);
     console.log(' req.file:', req.file);
@@ -87,7 +87,7 @@ router.post('/', verifyToken, verifyAdmin, upload.single('imageUrl'), async (req
 
 
 
-router.put('/:id', verifyToken, verifyAdmin, upload.single('imageUrl'), async (req, res) => {
+router.put('/:id', verifyToken, verifyAdmin, upload.single('image'), async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
@@ -110,7 +110,7 @@ router.put('/:id', verifyToken, verifyAdmin, upload.single('imageUrl'), async (r
       : product.promotion;
 
     if (req.file?.secure_url) {
-      product.imageUrl = req.file.secure_url;  // ✅ CORREGIDO
+      product.imageUrl = req.file.secure_url;  //  CORREGIDO
     }
 
     await product.save();
