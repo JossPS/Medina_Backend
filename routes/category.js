@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Category = require('../models/Category');
 const verifyAdmin = require('../middleware/verifyAdmin');
+const verifyToken = require('../middleware/verifyToken');
 
 // Obtener todas las categorías
 router.get('/', async (_req, res) => {
