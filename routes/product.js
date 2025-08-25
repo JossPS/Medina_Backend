@@ -64,6 +64,12 @@ router.post('/', verifyToken, verifyAdmin, upload.single('image'), async (req, r
       return res.status(400).json({ error: 'Ya existe un producto con ese código' });
     }
 
+     // Validar que la categoría exista
+    const categoryExists = await Category.findOne({ name: req.body.category });
+    if (!categoryExists) {
+      return res.status(400).json({ error: 'Categoría no válida' });
+    }
+
     // Construir producto con URL pública segura
     const newProduct = new Product({
       name: req.body.name,
