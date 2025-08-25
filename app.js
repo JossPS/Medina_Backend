@@ -33,6 +33,8 @@ app.use(cors({
 
 // Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 // Rutas API
 app.use('/api/products', productRoutes);
