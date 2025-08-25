@@ -10,7 +10,7 @@ router.get('/', async (_req, res) => {
 });
 
 // Crear nueva categoría
-router.post('/', verifyAdmin, async (req, res) => {
+router.post('/', verifyToken, verifyAdmin, async (req, res) => {
   const { name } = req.body;
   if (!name) return res.status(400).json({ message: 'Nombre requerido' });
 
@@ -22,9 +22,10 @@ router.post('/', verifyAdmin, async (req, res) => {
 });
 
 // Eliminar categoría
-router.delete('/:id', verifyAdmin, async (req, res) => {
+router.delete('/:id', verifyToken, verifyAdmin, async (req, res) => {
   await Category.findByIdAndDelete(req.params.id);
   res.sendStatus(204);
 });
+
 
 module.exports = router;
