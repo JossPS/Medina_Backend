@@ -54,7 +54,7 @@ router.post('/', verifyToken, verifyAdmin, upload.single('image'), async (req, r
     console.log(' req.file:', req.file);
 
     //Validar si no llegó imagen
-    if (!req.file?.secure_url) {
+    if (!req.file?.path) {
       return res.status(400).json({ error: 'No se recibió una imagen válida desde Cloudinary' });
     }
 
@@ -73,7 +73,7 @@ router.post('/', verifyToken, verifyAdmin, upload.single('image'), async (req, r
       description: req.body.description,
       stock: req.body.stock,
       promotion: req.body.promotion === 'true',
-      imageUrl: req.file.secure_url,
+      imageUrl: req.file.path,
       category: req.body.category
     });
 
@@ -109,8 +109,8 @@ router.put('/:id', verifyToken, verifyAdmin, upload.single('image'), async (req,
       ? (req.body.promotion === 'true' || req.body.promotion === true)
       : product.promotion;
 
-    if (req.file?.secure_url) {
-      product.imageUrl = req.file.secure_url;  //  CORREGIDO
+    if (req.file?.path) {
+      product.imageUrl = req.file.path;  //  CORREGIDO
     }
 
     await product.save();
