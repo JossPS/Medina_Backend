@@ -8,7 +8,7 @@ const productRoutes = require('./routes/product');
 const userRoutes = require('./routes/user'); 
 const loginRoutes = require('./routes/login'); 
 const categoryRoutes = require('./routes/category');
-app.use('/api/categories', categoryRoutes);
+
 
 const app = express();
 const port = process.env.PORT || 9000;
@@ -43,7 +43,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/products', productRoutes);
 app.use('/api/auth', loginRoutes);
 app.use('/api', userRoutes); 
-
+app.use('/api/categories', categoryRoutes);
 // Rutas estáticas para servir archivos
 app.use('/uploads', express.static(path.join(__dirname, './uploads'))); 
 app.use('/cliente', express.static(path.join(__dirname, '../Frontend-Client')));
