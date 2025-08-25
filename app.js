@@ -15,7 +15,8 @@ const port = process.env.PORT || 9000;
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'http://medina-admin-frontend.s3-website-us-east-1.amazonaws.com'
+  'http://medina-admin-frontend.s3-website-us-east-1.amazonaws.com',
+  'http://medina-catalog-frontend.s3-website-us-east-1.amazonaws.com'
 ];
 
 app.use(cors({
